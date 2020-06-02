@@ -2,32 +2,28 @@ package main
 
 import (
 	"fmt"
-	"html"
+	"github.com/dlorch/errors.fail/config"
+	"github.com/dlorch/errors.fail/session"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
-	"strconv"
-	"time"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	p, err := strconv.ParseFloat(r.URL.Path[1:], 32)
-	if err != nil || p < 0 || p > 1.0 {
-		p = 1.0
-	}
-	if rand.Float32() < float32(p) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+	probe := session.ReadBoolOrDefault("http_probe", true)
+
+	if probe {
+		fmt.Fprintf(w, "<h1>200 OK</h1>\n")
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "<h1>500 Internal Server Error</h1><p>Intentionally failing this request with probabilty of %.2f.</p>", p)
+		fmt.Fprintf(w, "<h1>500 Internal Server Error</h1>\n")
 	}
+
+	fmt.Fprintf(w, "<p>Change your settings at <a href=\"https://%s/?%s\">errors.fail</a>.</p>", config.CookieDomain, session.SessionID)
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", session.WithSession(handler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
