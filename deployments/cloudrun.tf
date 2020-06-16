@@ -1,6 +1,7 @@
 resource "google_cloud_run_service" "probe-errors-fail-service" {
-  name     = "probe-errors-fail"
-  location = "us-east1"
+  autogenerate_revision_name = "true"
+  name                       = "probe-errors-fail"
+  location                   = "us-east1"
 
   template {
     spec {
