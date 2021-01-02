@@ -3,7 +3,7 @@ steps:
   args: ['build', '-t', 'gcr.io/dlorch-bd021/probe-errors-fail', '.' ]
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/dlorch-bd021/probe-errors-fail']
-- name: 'hashicorp/terraform'
+- name: 'hashicorp/terraform:0.13.5'
   args: ['init', 'deployments']
-- name: 'hashicorp/terraform'
+- name: 'hashicorp/terraform:0.13.5'
   args: ['apply', '-auto-approve', 'deployments']
